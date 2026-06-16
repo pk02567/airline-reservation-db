@@ -1,2 +1,1 @@
-# airline-reservation-db
-Relational database schema for airline reservation system with SQL triggers
+Airline Reservation System — DBMS Mini Project. Relational database schema built in MySQL for managing flight bookings, seat allocation, and passenger records. Includes full DDL/DML scripts, triggers for automated booking validation and seat management, schema normalized to BCNF. Static HTML/JS frontend mockup included for UI demonstration.
