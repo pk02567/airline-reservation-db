@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airline Reservation System — DBMS Mini Project | DSATM</title>
+  <meta name="description" content="Interactive dashboard for Airline Reservation System DBMS Mini Project — B.Tech CSE-ICB, DSATM. Demonstrates DDL, triggers, joins, and aggregations on a MySQL airline database." />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-icon">✈</span>
+    <div class="logo-title">AirReserve DB</div>
+    <div class="logo-sub">DBMS Mini Project · DSATM</div>
+  </div>
+
+  <div class="nav-section">Navigation</div>
+
+  <nav id="main-nav">
+    <div class="nav-item active" data-page="overview"      id="nav-overview">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Overview</span>
+    </div>
+    <div class="nav-item" data-page="flights"              id="nav-flights">
+      <span class="nav-icon">🛫</span>
+      <span class="nav-label">Flights</span>
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" data-page="seatmap"              id="nav-seatmap">
+      <span class="nav-icon">💺</span>
+      <span class="nav-label">Seat Map</span>
+    </div>
+    <div class="nav-item" data-page="bookings"             id="nav-bookings">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Bookings</span>
+      <span class="nav-badge">8</span>
+    </div>
+    <div class="nav-item" data-page="revenue"              id="nav-revenue">
+      <span class="nav-icon">💰</span>
+      <span class="nav-label">Revenue</span>
+    </div>
+    <div class="nav-item" data-page="occupancy"            id="nav-occupancy">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Occupancy</span>
+    </div>
+    <div class="nav-item" data-page="cancellation"         id="nav-cancellation">
+      <span class="nav-icon">❌</span>
+      <span class="nav-label">Cancellation</span>
+    </div>
+    <div class="nav-item" data-page="schema"               id="nav-schema">
+      <span class="nav-icon">🗃️</span>
+      <span class="nav-label">Schema</span>
+    </div>
+    <div class="nav-item" data-page="queries"              id="nav-queries">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-label">SQL Queries</span>
+      <span class="nav-badge">6</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="team-tag">
+      <strong>Team Members</strong><br>
+      Prateek P Ellur · 1DT24IC029<br>
+      Sanjay · 1DT24IC035<br>
+      Pratham Arya · 1DT24IC030<br>
+      AS Vijay Kumar · 1DT24IC001
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="menu-toggle" id="menu-toggle" role="button" aria-label="Toggle navigation">☰</div>
+      <div>
+        <div class="topbar-title" id="topbar-title">System Overview</div>
+        <div class="topbar-subtitle">Airline Reservation System · B.Tech CSE-ICB · DSATM</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill green">
+        <div class="pulse"></div> DB Connected
+      </div>
+      <div class="dbms-badge">MySQL 8.0</div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       PAGE 1: OVERVIEW
+       ============================================================ -->
+  <section class="page active" id="page-overview">
+    <div class="page-header">
+      <h1 class="page-title">System Overview</h1>
+      <p class="page-desc">Key metrics and quick summary of the airline reservation database</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon">🛫</div>
+        <div class="stat-value">5</div>
+        <div class="stat-label">Total Flights</div>
+        <div class="stat-sub">4 Scheduled · 1 Delayed</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-icon">👤</div>
+        <div class="stat-value">8</div>
+        <div class="stat-label">Passengers</div>
+        <div class="stat-sub">7 confirmed · 1 cancelled</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">💺</div>
+        <div class="stat-value">31</div>
+        <div class="stat-label">Sample Seats</div>
+        <div class="stat-sub">Across all 5 scheduled flights</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">💰</div>
+        <div class="stat-value">₹49,900</div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-sub">7 confirmed · 1 refunded</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Airports table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏙️ Airports (5)</div>
+          <span class="badge badge-blue">airports</span>
+        </div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr>
+              <th>IATA</th><th>Name</th><th>City</th><th>Country</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><strong>BLR</strong></td><td>Kempegowda Intl</td><td>Bengaluru</td><td>India</td></tr>
+              <tr><td><strong>DEL</strong></td><td>Indira Gandhi Intl</td><td>New Delhi</td><td>India</td></tr>
+              <tr><td><strong>BOM</strong></td><td>CSIA</td><td>Mumbai</td><td>India</td></tr>
+              <tr><td><strong>MAA</strong></td><td>Chennai Intl</td><td>Chennai</td><td>India</td></tr>
+              <tr><td><strong>HYD</strong></td><td>Rajiv Gandhi Intl</td><td>Hyderabad</td><td>India</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Aircraft table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">✈️ Aircraft (3)</div>
+          <span class="badge badge-cyan">aircraft</span>
+        </div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr>
+              <th>Model</th><th>Total</th><th>Economy</th><th>Business</th>
+            </tr></thead>
+            <tbody>
+              <tr><td><strong>Boeing 737-800</strong></td><td>162</td><td>138</td><td>24</td></tr>
+              <tr><td><strong>Airbus A320</strong></td><td>150</td><td>126</td><td>24</td></tr>
+              <tr><td><strong>Boeing 777-300</strong></td><td>350</td><td>308</td><td>42</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Triggers info -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚡ Active Triggers</div>
+        <span class="badge badge-purple">2 triggers</span>
+      </div>
+      <div class="card-body">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:20px;">
+          <div class="trigger-box" style="margin:0;">
+            <div class="trigger-box-title">⚡ mark_seat_unavailable</div>
+            <div class="trigger-box-body">
+              AFTER INSERT ON bookings<br>
+              → Sets seats.is_available = FALSE<br>
+              &nbsp;&nbsp; for the booked seat_id
+            </div>
+          </div>
+          <div class="trigger-box" style="margin:0;">
+            <div class="trigger-box-title">⚡ restore_seat_on_cancel</div>
+            <div class="trigger-box-body">
+              AFTER INSERT ON cancellations<br>
+              → Sets seats.is_available = TRUE<br>
+              &nbsp;&nbsp; via JOIN bookings on booking_id
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 2: FLIGHTS
+       ============================================================ -->
+  <section class="page" id="page-flights">
+    <div class="page-header">
+      <h1 class="page-title">All Flights</h1>
+      <p class="page-desc">5 flights across 5 Indian airports — AI, IndiGo, SpiceJet</p>
+    </div>
+
+    <div class="info-row">
+      ℹ️ &nbsp;Flights table uses FOREIGN KEYs to airports and aircraft tables, with a CHECK constraint ensuring arrival_time &gt; departure_time.
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🛫 flights table</div>
+        <span class="badge badge-purple">SELECT * FROM flights JOIN airports JOIN aircraft</span>
+      </div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th>Flight No.</th>
+            <th>Route</th>
+            <th>Aircraft</th>
+            <th>Departure</th>
+            <th>Arrival</th>
+            <th>Duration</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>AI-204</strong></td>
+              <td>BLR → DEL</td>
+              <td>Boeing 737-800</td>
+              <td>05 Jun 06:00</td>
+              <td>05 Jun 08:45</td>
+              <td>2h 45m</td>
+              <td><span class="badge badge-blue">SCHEDULED</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>6E-301</strong></td>
+              <td>BLR → BOM</td>
+              <td>Airbus A320</td>
+              <td>05 Jun 09:30</td>
+              <td>05 Jun 11:15</td>
+              <td>1h 45m</td>
+              <td><span class="badge badge-blue">SCHEDULED</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>SG-415</strong></td>
+              <td>DEL → MAA</td>
+              <td>Boeing 737-800</td>
+              <td>05 Jun 13:00</td>
+              <td>05 Jun 15:30</td>
+              <td>2h 30m</td>
+              <td><span class="badge badge-blue">SCHEDULED</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>AI-890</strong></td>
+              <td>BOM → HYD</td>
+              <td>Boeing 777-300</td>
+              <td>05 Jun 17:00</td>
+              <td>05 Jun 18:20</td>
+              <td>1h 20m</td>
+              <td><span class="badge badge-yellow">DELAYED</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>6E-112</strong></td>
+              <td>MAA → BLR</td>
+              <td>Airbus A320</td>
+              <td>05 Jun 20:00</td>
+              <td>05 Jun 21:45</td>
+              <td>1h 45m</td>
+              <td><span class="badge badge-blue">SCHEDULED</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 3: SEAT MAP
+       ============================================================ -->
+  <section class="page" id="page-seatmap">
+    <div class="page-header">
+      <h1 class="page-title">Seat Map — Flight AI-204</h1>
+      <p class="page-desc">Demo Query 1: SELECT seat_number, class, price, is_available FROM seats WHERE flight_id = 1</p>
+    </div>
+
+    <div class="card">
+      <div class="seatmap-legend">
+        <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Legend:</span>
+        <div class="legend-item"><div class="legend-seat available-biz">B</div> Business — Available</div>
+        <div class="legend-item"><div class="legend-seat available-eco">E</div> Economy — Available</div>
+        <div class="legend-item"><div class="legend-seat booked">✕</div> Booked (trigger fired)</div>
+        <div class="legend-item"><div class="legend-seat released">✓</div> Released (cancel trigger)</div>
+      </div>
+      <div class="seatmap-body">
+        <div class="seatmap-flight-info">
+          <div class="seatmap-route">BLR ✈ DEL</div>
+          <div class="seatmap-details">AI-204 · Boeing 737-800 · 05 Jun 2026 · Dep 06:00</div>
+        </div>
+        <div class="aircraft-body" id="seat-map-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row" style="margin-top:20px;">
+      ⚡ <strong>Trigger fired:</strong>&nbsp; After each INSERT into bookings, <code style="font-family:monospace;color:var(--accent-cyan)">mark_seat_unavailable</code> set is_available = FALSE for booked seats.
+      <br><strong style="color:var(--accent-yellow)">⚠ DB Note:</strong>&nbsp; After running the full SQL script (which includes Q5 cancellation steps), seat 4A is already <span style="color:var(--accent-green)">AVAILABLE</span> in MySQL. This seat map shows the <em>initial booking state</em> to keep the Cancellation Demo interactive.
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 4: BOOKINGS
+       ============================================================ -->
+  <section class="page" id="page-bookings">
+    <div class="page-header">
+      <h1 class="page-title">Booking Details</h1>
+      <p class="page-desc">Demo Query 2: 6-table JOIN — bookings ⟕ passengers ⟕ seats ⟕ flights ⟕ airports ⟕ payments</p>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 All Bookings</div>
+        <span class="badge badge-green">8 records</span>
+      </div>
+      <div class="card-body table-wrap">
+        <table>
+          <thead><tr>
+            <th>PNR</th>
+            <th>Passenger</th>
+            <th>Route</th>
+            <th>Flight</th>
+            <th>Departure</th>
+            <th>Seat</th>
+            <th>Class</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Booking Status</th>
+          </tr></thead>
+          <tbody id="bookings-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 5: REVENUE
+       ============================================================ -->
+  <section class="page" id="page-revenue">
+    <div class="page-header">
+      <h1 class="page-title">Revenue Analytics</h1>
+      <p class="page-desc">Demo Queries 3 & 4: GROUP BY + SUM + JOIN — revenue per flight and class breakdown</p>
+    </div>
+
+    <div class="chart-grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💰 Revenue Per Flight</div>
+          <span class="badge badge-blue">Demo Query 3</span>
+        </div>
+        <div class="chart-container">
+          <div class="chart-wrap">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Economy vs Business</div>
+          <span class="badge badge-purple">Demo Query 4</span>
+        </div>
+        <div class="chart-container">
+          <div class="chart-wrap">
+            <canvas id="classChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Revenue Per Flight (Table)</div>
+        </div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr>
+              <th>Flight</th><th>Route</th><th>Bookings</th><th>Total Revenue</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>AI-204</strong></td>
+                <td>Bengaluru → New Delhi</td>
+                <td>5</td>
+                <td><strong style="color:var(--accent-green)">₹37,200</strong></td>
+              </tr>
+              <tr>
+                <td><strong>6E-301</strong></td>
+                <td>Bengaluru → Mumbai</td>
+                <td>2</td>
+                <td><strong style="color:var(--accent-green)">₹12,700</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Class Breakdown (Table)</div>
+        </div>
+        <div class="card-body table-wrap">
+          <table>
+            <thead><tr>
+              <th>Class</th><th>Bookings</th><th>Revenue</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-purple">BUSINESS</span></td>
+                <td>3</td>
+                <td><strong style="color:var(--accent-green)">₹34,800</strong></td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-cyan">ECONOMY</span></td>
+                <td>4</td>
+                <td><strong style="color:var(--accent-green)">₹15,100</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 6: OCCUPANCY
+       ============================================================ -->
+  <section class="page" id="page-occupancy">
+    <div class="page-header">
+      <h1 class="page-title">Flight Occupancy</h1>
+      <p class="page-desc">Demo Query 6: ROUND(COUNT(bookings) * 100.0 / aircraft.total_seats, 1) — with LEFT JOIN and HAVING</p>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div class="card-title">📊 Occupancy % per Flight</div>
+        <span class="badge badge-blue">Demo Query 6</span>
+      </div>
+      <div class="chart-container">
+        <div class="chart-wrap" style="height:280px;">
+          <canvas id="occupancyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📋 Occupancy Details</div>
+      </div>
+      <div class="occupancy-list">
+        <div class="occ-item">
+          <div class="occ-header">
+            <div><div class="occ-flight">AI-204 — Boeing 737-800</div><div class="occ-route">Bengaluru → New Delhi · 162 total seats</div></div>
+            <div class="occ-pct">3.1%</div>
+          </div>
+          <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:3.1%;background:linear-gradient(90deg,#3b9eff,#00d4ff)"></div></div>
+        </div>
+        <div class="occ-item">
+          <div class="occ-header">
+            <div><div class="occ-flight">6E-301 — Airbus A320</div><div class="occ-route">Bengaluru → Mumbai · 150 total seats</div></div>
+            <div class="occ-pct">1.3%</div>
+          </div>
+          <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:1.3%;background:linear-gradient(90deg,#a855f7,#3b9eff)"></div></div>
+        </div>
+        <div class="occ-item">
+          <div class="occ-header">
+            <div><div class="occ-flight">SG-415 — Boeing 737-800</div><div class="occ-route">New Delhi → Chennai · 162 total seats</div></div>
+            <div class="occ-pct">0.0%</div>
+          </div>
+          <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:0%;background:linear-gradient(90deg,#22d3a0,#3b9eff)"></div></div>
+        </div>
+        <div class="occ-item">
+          <div class="occ-header">
+            <div><div class="occ-flight">AI-890 — Boeing 777-300</div><div class="occ-route">Mumbai → Hyderabad · 350 total seats</div></div>
+            <div class="occ-pct">0.0%</div>
+          </div>
+          <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:0%;background:linear-gradient(90deg,#fbbf24,#f87171)"></div></div>
+        </div>
+        <div class="occ-item">
+          <div class="occ-header">
+            <div><div class="occ-flight">6E-112 — Airbus A320</div><div class="occ-route">Chennai → Bengaluru · 150 total seats</div></div>
+            <div class="occ-pct">0.0%</div>
+          </div>
+          <div class="occ-bar-bg"><div class="occ-bar-fill" style="width:0%;background:linear-gradient(90deg,#22d3a0,#00d4ff)"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      ℹ️ &nbsp;Only AI-204 and 6E-301 have sample seats inserted. Remaining flights show 0% as seats table has no rows for them (demonstrating LEFT JOIN behavior).
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 7: CANCELLATION DEMO
+       ============================================================ -->
+  <section class="page" id="page-cancellation">
+    <div class="page-header">
+      <h1 class="page-title">Cancellation Demo</h1>
+      <p class="page-desc">Demo Query 5: Priya (PNR001) cancels — watch seat 4A flip BOOKED → AVAILABLE via trigger</p>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👤 Passenger Booking</div>
+        </div>
+        <div class="card-body">
+          <div style="padding:20px;">
+            <table>
+              <tbody>
+                <tr><td style="color:var(--text-muted);width:130px">PNR</td><td><strong>PNR001</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Passenger</td><td><strong>Priya Sharma</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Flight</td><td><strong>AI-204 (BLR → DEL)</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Seat</td><td><strong>4A — Economy</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Amount Paid</td><td><strong>₹4,200</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Payment</td><td><strong>UPI</strong></td></tr>
+                <tr><td style="color:var(--text-muted)">Status</td><td id="cancel-booking-status"><span class="badge badge-green">CONFIRMED</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💺 Seat 4A — Live Status</div>
+        </div>
+        <div class="card-body" style="display:flex;align-items:center;justify-content:center;padding:32px;">
+          <div id="cancel-seat-visual" class="seat booked" style="width:100px;height:100px;font-size:16px;border-radius:16px;font-weight:800;">
+            <span class="seat-icon">🔒</span>
+            <span class="seat-num" style="font-size:14px;">4A</span>
+            <span style="font-size:10px;margin-top:4px;color:var(--accent-red)">BOOKED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚡ Step-by-Step Cancellation</div>
+        <span class="badge badge-purple">5 SQL steps</span>
+      </div>
+      <div class="cancel-steps" id="cancel-steps-container">
+
+        <div class="cancel-step" id="step-0" data-step="0">
+          <div class="step-marker">A</div>
+          <div class="step-content">
+            <div class="step-label">Check seat BEFORE cancellation</div>
+            <div class="step-desc">Query seat_id = 4 to confirm it is currently BOOKED</div>
+            <div class="step-sql">SELECT seat_number, is_available FROM seats WHERE seat_id = 4;<br>-- Result: 4A | FALSE (BOOKED)</div>
+            <div class="step-result">✅ seat_number = 4A &nbsp;|&nbsp; is_available = <strong>FALSE</strong> &nbsp;→ BOOKED</div>
+          </div>
+        </div>
+        <div class="connector-line"></div>
+
+        <div class="cancel-step" id="step-1" data-step="1">
+          <div class="step-marker">B</div>
+          <div class="step-content">
+            <div class="step-label">Update booking status → CANCELLED</div>
+            <div class="step-desc">Mark PNR001 as cancelled in the bookings table</div>
+            <div class="step-sql">UPDATE bookings SET status = 'CANCELLED' WHERE pnr = 'PNR001';</div>
+            <div class="step-result">✅ 1 row affected — booking_id 1 is now CANCELLED</div>
+          </div>
+        </div>
+        <div class="connector-line"></div>
+
+        <div class="cancel-step" id="step-2" data-step="2">
+          <div class="step-marker">C</div>
+          <div class="step-content">
+            <div class="step-label">Insert into cancellations → Trigger fires!</div>
+            <div class="step-desc">The AFTER INSERT trigger <code style="color:var(--accent-cyan);font-family:monospace">restore_seat_on_cancel</code> immediately sets seat 4A → is_available = TRUE</div>
+            <div class="step-sql">INSERT INTO cancellations (booking_id, reason, refund_amount, refund_status)<br>VALUES (1, 'Change of travel plans', 3780.00, 'PENDING');<br>-- ⚡ TRIGGER FIRES: seat 4A is_available ← TRUE</div>
+            <div class="step-result">✅ Trigger fired! is_available set to <strong>TRUE</strong> — seat 4A is now AVAILABLE</div>
+          </div>
+        </div>
+        <div class="connector-line"></div>
+
+        <div class="cancel-step" id="step-3" data-step="3">
+          <div class="step-marker">D</div>
+          <div class="step-content">
+            <div class="step-label">Update payment → REFUNDED</div>
+            <div class="step-desc">Mark the original payment as REFUNDED, refund of ₹3,780</div>
+            <div class="step-sql">UPDATE payments SET payment_status = 'REFUNDED' WHERE booking_id = 1;</div>
+            <div class="step-result">✅ Payment status changed SUCCESS → REFUNDED (₹3,780 refund initiated)</div>
+          </div>
+        </div>
+        <div class="connector-line"></div>
+
+        <div class="cancel-step" id="step-4" data-step="4">
+          <div class="step-marker">E</div>
+          <div class="step-content">
+            <div class="step-label">Verify seat AFTER cancellation</div>
+            <div class="step-desc">Confirm seat 4A is now AVAILABLE due to trigger</div>
+            <div class="step-sql">SELECT seat_number, is_available FROM seats WHERE seat_id = 4;<br>-- Result: 4A | TRUE (AVAILABLE) ← Trigger worked!</div>
+            <div class="step-result">✅ seat_number = 4A &nbsp;|&nbsp; is_available = <strong>TRUE</strong> &nbsp;→ AVAILABLE ✓</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="cancel-btn-group">
+        <button class="btn btn-danger" id="btn-next-step" onclick="nextCancelStep()">▶ Execute Next Step</button>
+        <button class="btn btn-ghost" id="btn-reset-cancel" onclick="resetCancelDemo()">↺ Reset Demo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       PAGE 8: SCHEMA
+       ============================================================ -->
+  <section class="page" id="page-schema">
+    <div class="page-header">
+      <h1 class="page-title">Database Schema</h1>
+      <p class="page-desc">8 tables with primary keys, foreign keys, ENUMs, and CHECK constraints</p>
+    </div>
+
+    <div class="info-row">
+      🔑 <strong>PK</strong> = Primary Key &nbsp;·&nbsp; 🔗 <strong>FK</strong> = Foreign Key &nbsp;·&nbsp; All tables use AUTO_INCREMENT integer PKs
+    </div>
+
+    <div class="schema-grid">
+      <!-- airports -->
+      <div class="schema-table">
+        <div class="schema-table-header airports">🏙️ airports</div>
+        <div class="schema-col"><span class="col-name">airport_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">iata_code</span><span class="col-type">CHAR(3) UNIQUE</span></div>
+        <div class="schema-col"><span class="col-name">airport_name</span><span class="col-type">VARCHAR(100)</span></div>
+        <div class="schema-col"><span class="col-name">city</span><span class="col-type">VARCHAR(50)</span></div>
+        <div class="schema-col"><span class="col-name">country</span><span class="col-type">VARCHAR(50)</span></div>
+      </div>
+
+      <!-- aircraft -->
+      <div class="schema-table">
+        <div class="schema-table-header aircraft">✈️ aircraft</div>
+        <div class="schema-col"><span class="col-name">aircraft_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">model</span><span class="col-type">VARCHAR(50)</span></div>
+        <div class="schema-col"><span class="col-name">total_seats</span><span class="col-type">INT</span></div>
+        <div class="schema-col"><span class="col-name">economy_seats</span><span class="col-type">INT</span></div>
+        <div class="schema-col"><span class="col-name">business_seats</span><span class="col-type">INT</span></div>
+      </div>
+
+      <!-- flights -->
+      <div class="schema-table">
+        <div class="schema-table-header flights">🛫 flights</div>
+        <div class="schema-col"><span class="col-name">flight_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">flight_number</span><span class="col-type">VARCHAR(10) UNIQUE</span></div>
+        <div class="schema-col"><span class="col-name">origin_airport_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ airports</span></span></div>
+        <div class="schema-col"><span class="col-name">dest_airport_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ airports</span></span></div>
+        <div class="schema-col"><span class="col-name">aircraft_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ aircraft</span></span></div>
+        <div class="schema-col"><span class="col-name">departure_time</span><span class="col-type">DATETIME</span></div>
+        <div class="schema-col"><span class="col-name">arrival_time</span><span class="col-type">DATETIME CHECK</span></div>
+        <div class="schema-col"><span class="col-name">status</span><span class="col-type">ENUM(4)</span></div>
+      </div>
+
+      <!-- passengers -->
+      <div class="schema-table">
+        <div class="schema-table-header passengers">👤 passengers</div>
+        <div class="schema-col"><span class="col-name">passenger_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">full_name</span><span class="col-type">VARCHAR(100)</span></div>
+        <div class="schema-col"><span class="col-name">email</span><span class="col-type">VARCHAR(100) UNIQUE</span></div>
+        <div class="schema-col"><span class="col-name">phone</span><span class="col-type">VARCHAR(15)</span></div>
+        <div class="schema-col"><span class="col-name">passport_number</span><span class="col-type">VARCHAR(20) UNIQUE</span></div>
+        <div class="schema-col"><span class="col-name">date_of_birth</span><span class="col-type">DATE</span></div>
+      </div>
+
+      <!-- seats -->
+      <div class="schema-table">
+        <div class="schema-table-header seats">💺 seats</div>
+        <div class="schema-col"><span class="col-name">seat_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">flight_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ flights</span></span></div>
+        <div class="schema-col"><span class="col-name">seat_number</span><span class="col-type">VARCHAR(5)</span></div>
+        <div class="schema-col"><span class="col-name">class</span><span class="col-type">ENUM(ECO,BIZ)</span></div>
+        <div class="schema-col"><span class="col-name">is_available</span><span class="col-type">BOOLEAN DEF TRUE</span></div>
+        <div class="schema-col"><span class="col-name">price</span><span class="col-type">DECIMAL(10,2)</span></div>
+      </div>
+
+      <!-- bookings -->
+      <div class="schema-table">
+        <div class="schema-table-header bookings">📋 bookings</div>
+        <div class="schema-col"><span class="col-name">booking_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">passenger_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ passengers</span></span></div>
+        <div class="schema-col"><span class="col-name">seat_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ seats UNIQUE</span></span></div>
+        <div class="schema-col"><span class="col-name">booking_date</span><span class="col-type">DATETIME DEF NOW()</span></div>
+        <div class="schema-col"><span class="col-name">status</span><span class="col-type">ENUM(3)</span></div>
+        <div class="schema-col"><span class="col-name">pnr</span><span class="col-type">CHAR(6) UNIQUE</span></div>
+      </div>
+
+      <!-- payments -->
+      <div class="schema-table">
+        <div class="schema-table-header payments">💳 payments</div>
+        <div class="schema-col"><span class="col-name">payment_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">booking_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ bookings UNIQUE</span></span></div>
+        <div class="schema-col"><span class="col-name">amount</span><span class="col-type">DECIMAL(10,2)</span></div>
+        <div class="schema-col"><span class="col-name">payment_method</span><span class="col-type">ENUM(4)</span></div>
+        <div class="schema-col"><span class="col-name">payment_status</span><span class="col-type">ENUM(4)</span></div>
+        <div class="schema-col"><span class="col-name">transaction_date</span><span class="col-type">DATETIME DEF NOW()</span></div>
+      </div>
+
+      <!-- cancellations -->
+      <div class="schema-table">
+        <div class="schema-table-header cancellations">❌ cancellations</div>
+        <div class="schema-col"><span class="col-name">cancel_id</span><span><span class="col-pk">PK</span> &nbsp;<span class="col-type">INT AI</span></span></div>
+        <div class="schema-col"><span class="col-name">booking_id</span><span><span class="col-fk">FK</span> &nbsp;<span class="col-type">→ bookings</span></span></div>
+        <div class="schema-col"><span class="col-name">cancelled_at</span><span class="col-type">DATETIME DEF NOW()</span></div>
+        <div class="schema-col"><span class="col-name">reason</span><span class="col-type">TEXT</span></div>
+        <div class="schema-col"><span class="col-name">refund_amount</span><span class="col-type">DECIMAL(10,2)</span></div>
+        <div class="schema-col"><span class="col-name">refund_status</span><span class="col-type">ENUM(3)</span></div>
+      </div>
+    </div>
+
+    <!-- ER relationships -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header">
+        <div class="card-title">🔗 Relationships (ER Summary)</div>
+      </div>
+      <div class="card-body">
+        <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="trigger-box" style="margin:0;">
+            <div class="trigger-box-title">One-to-Many</div>
+            <div class="trigger-box-body">
+              airports (1) → (M) flights [origin]<br>
+              airports (1) → (M) flights [destination]<br>
+              aircraft (1) → (M) flights<br>
+              flights  (1) → (M) seats<br>
+              passengers (1) → (M) bookings<br>
+              bookings (1) → (M) cancellations
+            </div>
+          </div>
+          <div class="trigger-box" style="margin:0;">
+            <div class="trigger-box-title">One-to-One</div>
+            <div class="trigger-box-body">
+              bookings (1) → (1) payments<br>
+              bookings (1) → (1) seats [UNIQUE FK]<br>
+              <span style="color:var(--text-muted);font-size:10px;">seat_id is UNIQUE on bookings — enforces 1:1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PAGE 9: SQL QUERY EXPLORER
+       ============================================================ -->
+  <section class="page" id="page-queries">
+    <div class="page-header">
+      <h1 class="page-title">SQL Query Explorer</h1>
+      <p class="page-desc">6 demo queries — click any card to expand the full SQL, concepts used, and expected results</p>
+    </div>
+
+    <div class="query-summary-bar">
+      <span class="qs-item"><span class="qs-dot blue"></span>SELECT / WHERE / CASE WHEN</span>
+      <span class="qs-item"><span class="qs-dot cyan"></span>6-Table JOIN</span>
+      <span class="qs-item"><span class="qs-dot purple"></span>GROUP BY / SUM / COUNT</span>
+      <span class="qs-item"><span class="qs-dot green"></span>⚡ TRIGGER demo</span>
+      <span class="qs-item"><span class="qs-dot yellow"></span>LEFT JOIN / ROUND()</span>
+    </div>
+
+    <div class="query-accordion" id="query-accordion">
+
+      <!-- Q1 -->
+      <div class="qcard" id="qcard-1">
+        <div class="qcard-header" onclick="toggleQuery(1)">
+          <div class="qcard-left">
+            <div class="qnum">Q1</div>
+            <div>
+              <div class="qcard-title">Seat Availability Check — Flight AI-204</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">SELECT</span>
+                <span class="qtag cyan">CASE WHEN</span>
+                <span class="qtag purple">WHERE</span>
+                <span class="qtag green">Trigger result visible</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-1">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-1">
+          <p class="qcard-desc">Shows all 10 sample seats for AI-204 with their availability. The <code class="inline-code">mark_seat_unavailable</code> trigger set is_available = FALSE for each booking INSERT — clearly visible here as BOOKED seats.</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">SELECT
+    s.seat_number,
+    s.class,
+    s.price,
+    CASE WHEN s.is_available
+         THEN 'AVAILABLE'
+         ELSE 'BOOKED'
+    END AS seat_status
+FROM seats s
+WHERE s.flight_id = 1
+ORDER BY s.seat_number;</pre>
+            <button class="copy-btn" id="copy-btn-1" onclick="copySQL(1)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Result — 10 rows</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>seat_number</th><th>class</th><th>price</th><th>seat_status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>1A</strong></td><td>BUSINESS</td><td>₹12,500</td><td><span class="badge badge-red">BOOKED</span></td></tr>
+                <tr><td><strong>1B</strong></td><td>BUSINESS</td><td>₹12,500</td><td><span class="badge badge-red">BOOKED</span></td></tr>
+                <tr><td><strong>2A</strong></td><td>BUSINESS</td><td>₹11,800</td><td><span class="badge badge-green">AVAILABLE</span></td></tr>
+                <tr><td><strong>4A</strong></td><td>ECONOMY</td><td>₹4,200</td><td><span class="badge badge-green">AVAILABLE</span></td></tr>
+                <tr><td><strong>4B</strong></td><td>ECONOMY</td><td>₹4,200</td><td><span class="badge badge-red">BOOKED</span></td></tr>
+                <tr><td><strong>4C</strong></td><td>ECONOMY</td><td>₹4,200</td><td><span class="badge badge-red">BOOKED</span></td></tr>
+                <tr><td><strong>10A</strong></td><td>ECONOMY</td><td>₹3,800</td><td><span class="badge badge-red">BOOKED</span></td></tr>
+                <tr><td><strong>10B</strong></td><td>ECONOMY</td><td>₹3,800</td><td><span class="badge badge-green">AVAILABLE</span></td></tr>
+                <tr><td><strong>15A</strong></td><td>ECONOMY</td><td>₹3,500</td><td><span class="badge badge-green">AVAILABLE</span></td></tr>
+                <tr><td><strong>15B</strong></td><td>ECONOMY</td><td>₹3,500</td><td><span class="badge badge-green">AVAILABLE</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="qcard" id="qcard-2">
+        <div class="qcard-header" onclick="toggleQuery(2)">
+          <div class="qcard-left">
+            <div class="qnum">Q2</div>
+            <div>
+              <div class="qcard-title">Full Booking Details — 6-Table JOIN</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">JOIN × 6</span>
+                <span class="qtag cyan">passengers · seats</span>
+                <span class="qtag purple">flights · airports × 2</span>
+                <span class="qtag green">payments</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-2">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-2">
+          <p class="qcard-desc">Joins bookings ⟕ passengers ⟕ seats ⟕ flights ⟕ airports (aliased a1/a2 for origin &amp; destination) ⟕ payments into one comprehensive result. Classic multi-table relational query demonstrating FK traversal.</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">SELECT
+    b.pnr,
+    p.full_name,
+    CONCAT(a1.iata_code, ' -&gt; ', a2.iata_code) AS route,
+    f.flight_number,
+    f.departure_time,
+    s.seat_number,
+    s.class,
+    pay.amount,
+    pay.payment_method,
+    b.status AS booking_status
+FROM bookings b
+JOIN passengers p  ON p.passenger_id = b.passenger_id
+JOIN seats s       ON s.seat_id      = b.seat_id
+JOIN flights f     ON f.flight_id    = s.flight_id
+JOIN airports a1   ON a1.airport_id  = f.origin_airport_id
+JOIN airports a2   ON a2.airport_id  = f.dest_airport_id
+JOIN payments pay  ON pay.booking_id = b.booking_id
+ORDER BY b.booking_id;</pre>
+            <button class="copy-btn" id="copy-btn-2" onclick="copySQL(2)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Result — 8 rows · after Q5 runs: PNR001 = CANCELLED</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>PNR</th><th>Passenger</th><th>Route</th><th>Flight</th><th>Seat</th><th>Class</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>PNR001</strong></td><td>Priya Sharma</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>4A</strong></td><td><span class="badge badge-cyan">ECONOMY</span></td><td><strong style="color:var(--accent-green)">₹4,200</strong></td><td>📲 UPI</td><td><span class="badge badge-red">CANCELLED</span></td></tr>
+                <tr><td><strong>PNR002</strong></td><td>Rahul Mehta</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>4B</strong></td><td><span class="badge badge-cyan">ECONOMY</span></td><td><strong style="color:var(--accent-green)">₹4,200</strong></td><td>💳 CARD</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR003</strong></td><td>Ananya Iyer</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>1A</strong></td><td><span class="badge badge-purple">BUSINESS</span></td><td><strong style="color:var(--accent-green)">₹12,500</strong></td><td>🏦 NETBANKING</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR004</strong></td><td>Karan Verma</td><td>BLR → BOM</td><td><strong>6E-301</strong></td><td><strong>1A</strong></td><td><span class="badge badge-purple">BUSINESS</span></td><td><strong style="color:var(--accent-green)">₹9,800</strong></td><td>💳 CARD</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR005</strong></td><td>Sneha Nair</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>10A</strong></td><td><span class="badge badge-cyan">ECONOMY</span></td><td><strong style="color:var(--accent-green)">₹3,800</strong></td><td>👛 WALLET</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR006</strong></td><td>Arjun Patel</td><td>BLR → BOM</td><td><strong>6E-301</strong></td><td><strong>3A</strong></td><td><span class="badge badge-cyan">ECONOMY</span></td><td><strong style="color:var(--accent-green)">₹2,900</strong></td><td>📲 UPI</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR007</strong></td><td>Divya Reddy</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>4C</strong></td><td><span class="badge badge-cyan">ECONOMY</span></td><td><strong style="color:var(--accent-green)">₹4,200</strong></td><td>💳 CARD</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+                <tr><td><strong>PNR008</strong></td><td>Vikram Singh</td><td>BLR → DEL</td><td><strong>AI-204</strong></td><td><strong>1B</strong></td><td><span class="badge badge-purple">BUSINESS</span></td><td><strong style="color:var(--accent-green)">₹12,500</strong></td><td>🏦 NETBANKING</td><td><span class="badge badge-green">CONFIRMED</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="qcard" id="qcard-3">
+        <div class="qcard-header" onclick="toggleQuery(3)">
+          <div class="qcard-left">
+            <div class="qnum">Q3</div>
+            <div>
+              <div class="qcard-title">Revenue Per Flight — GROUP BY + SUM</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">GROUP BY</span>
+                <span class="qtag cyan">SUM()</span>
+                <span class="qtag purple">COUNT()</span>
+                <span class="qtag green">ORDER BY DESC</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-3">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-3">
+          <p class="qcard-desc">Aggregates total revenue and booking count per flight using GROUP BY. Filters only SUCCESS payments via WHERE, then orders by highest revenue — AI-204 leads with ₹37,200 from <strong>5 confirmed bookings</strong> (PNR001 excluded: payment = REFUNDED after Q5).</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">SELECT
+    f.flight_number,
+    CONCAT(a1.city, ' -&gt; ', a2.city) AS route,
+    COUNT(b.booking_id)              AS total_bookings,
+    SUM(pay.amount)                  AS total_revenue
+FROM flights f
+JOIN airports a1   ON a1.airport_id  = f.origin_airport_id
+JOIN airports a2   ON a2.airport_id  = f.dest_airport_id
+JOIN seats s       ON s.flight_id    = f.flight_id
+JOIN bookings b    ON b.seat_id      = s.seat_id
+JOIN payments pay  ON pay.booking_id = b.booking_id
+WHERE pay.payment_status = 'SUCCESS'
+GROUP BY f.flight_id, f.flight_number, route
+ORDER BY total_revenue DESC;</pre>
+            <button class="copy-btn" id="copy-btn-3" onclick="copySQL(3)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Result — 2 rows (only flights with bookings appear)</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>flight_number</th><th>route</th><th>total_bookings</th><th>total_revenue</th></tr></thead>
+              <tbody>
+                <tr><td><strong>AI-204</strong></td><td>Bengaluru → New Delhi</td><td>5</td><td><strong style="color:var(--accent-green)">₹37,200</strong></td></tr>
+                <tr><td><strong>6E-301</strong></td><td>Bengaluru → Mumbai</td><td>2</td><td><strong style="color:var(--accent-green)">₹12,700</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="qcard" id="qcard-4">
+        <div class="qcard-header" onclick="toggleQuery(4)">
+          <div class="qcard-left">
+            <div class="qnum">Q4</div>
+            <div>
+              <div class="qcard-title">Business vs Economy Revenue Breakdown</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">GROUP BY class</span>
+                <span class="qtag cyan">ENUM column</span>
+                <span class="qtag purple">SUM() COUNT()</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-4">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-4">
+          <p class="qcard-desc">Groups by the ENUM column <code class="inline-code">seats.class</code> to compare Business vs Economy. Despite fewer bookings (3 vs 4), Business generates ~70% of total revenue — ₹34,800 vs ₹15,100. PNR001 (Economy) was refunded after Q5, reducing Economy count from 5 to 4.</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">SELECT
+    s.class,
+    COUNT(b.booking_id) AS bookings,
+    SUM(pay.amount)     AS revenue
+FROM bookings b
+JOIN seats s      ON s.seat_id      = b.seat_id
+JOIN payments pay ON pay.booking_id = b.booking_id
+WHERE pay.payment_status = 'SUCCESS'
+GROUP BY s.class;</pre>
+            <button class="copy-btn" id="copy-btn-4" onclick="copySQL(4)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Result — 2 rows</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>class</th><th>bookings</th><th>revenue</th><th>avg per booking</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge badge-purple">BUSINESS</span></td><td>3</td><td><strong style="color:var(--accent-green)">₹34,800</strong></td><td style="color:var(--text-muted)">₹11,600</td></tr>
+                <tr><td><span class="badge badge-cyan">ECONOMY</span></td><td>4</td><td><strong style="color:var(--accent-green)">₹15,100</strong></td><td style="color:var(--text-muted)">₹3,775</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="qcard" id="qcard-5">
+        <div class="qcard-header" onclick="toggleQuery(5)">
+          <div class="qcard-left">
+            <div class="qnum">Q5</div>
+            <div>
+              <div class="qcard-title">Cancellation Story — Trigger Demo (5 SQL Steps)</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">UPDATE</span>
+                <span class="qtag cyan">INSERT</span>
+                <span class="qtag purple">⚡ TRIGGER fires</span>
+                <span class="qtag green">REFUND flow</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-5">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-5">
+          <p class="qcard-desc">Full cancellation flow for Priya Sharma (PNR001). The INSERT into cancellations automatically fires trigger <code class="inline-code">restore_seat_on_cancel</code>, flipping seat 4A → is_available = TRUE with no manual UPDATE needed.</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">-- Step A: Check seat BEFORE cancellation
+SELECT seat_number, is_available
+FROM seats WHERE seat_id = 4;
+-- Result: 4A | FALSE  (BOOKED)
+
+-- Step B: Cancel the booking
+UPDATE bookings
+SET status = 'CANCELLED'
+WHERE pnr = 'PNR001';
+
+-- Step C: Insert cancellation record → TRIGGER FIRES ⚡
+INSERT INTO cancellations
+    (booking_id, reason, refund_amount, refund_status)
+VALUES (1, 'Change of travel plans', 3780.00, 'PENDING');
+-- restore_seat_on_cancel: SET seat 4A is_available = TRUE
+
+-- Step D: Mark payment as REFUNDED
+UPDATE payments
+SET payment_status = 'REFUNDED'
+WHERE booking_id = 1;
+
+-- Step E: Verify seat AFTER trigger
+SELECT seat_number, is_available
+FROM seats WHERE seat_id = 4;
+-- Result: 4A | TRUE  (AVAILABLE) ← Trigger worked!</pre>
+            <button class="copy-btn" id="copy-btn-5" onclick="copySQL(5)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Before / After Trigger Comparison</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>Stage</th><th>seat 4A (is_available)</th><th>booking status</th><th>payment_status</th></tr></thead>
+              <tbody>
+                <tr><td><strong>BEFORE</strong></td><td><span class="badge badge-red">FALSE — BOOKED</span></td><td><span class="badge badge-green">CONFIRMED</span></td><td><span class="badge badge-green">SUCCESS</span></td></tr>
+                <tr><td><strong>AFTER ⚡ trigger</strong></td><td><span class="badge badge-green">TRUE — AVAILABLE</span></td><td><span class="badge badge-red">CANCELLED</span></td><td><span class="badge badge-yellow">REFUNDED</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="qcard" id="qcard-6">
+        <div class="qcard-header" onclick="toggleQuery(6)">
+          <div class="qcard-left">
+            <div class="qnum">Q6</div>
+            <div>
+              <div class="qcard-title">Flight Occupancy % — LEFT JOIN + ROUND()</div>
+              <div class="qcard-tags">
+                <span class="qtag blue">LEFT JOIN</span>
+                <span class="qtag cyan">ROUND()</span>
+                <span class="qtag purple">Calculated column</span>
+                <span class="qtag green">NULL → 0 via COUNT</span>
+              </div>
+            </div>
+          </div>
+          <div class="qcard-chevron" id="qchevron-6">▼</div>
+        </div>
+        <div class="qcard-body" id="qbody-6">
+          <p class="qcard-desc">Uses LEFT JOIN to include all 5 flights, even those with 0 bookings. <code class="inline-code">ROUND(COUNT * 100.0 / total_seats, 1)</code> produces occupancy % — COUNT() safely returns 0 for unmatched LEFT JOIN rows (no NULL issues).</p>
+          <div class="sql-wrap">
+            <pre class="sql-block">SELECT
+    f.flight_number,
+    CONCAT(a1.city, ' -&gt; ', a2.city)                        AS route,
+    ac.total_seats,
+    COUNT(b.booking_id)                                     AS booked_seats,
+    ROUND(COUNT(b.booking_id) * 100.0 / ac.total_seats, 1) AS occupancy_pct
+FROM flights f
+JOIN  aircraft ac     ON ac.aircraft_id = f.aircraft_id
+JOIN  airports a1     ON a1.airport_id  = f.origin_airport_id
+JOIN  airports a2     ON a2.airport_id  = f.dest_airport_id
+LEFT JOIN seats s     ON s.flight_id    = f.flight_id
+LEFT JOIN bookings b  ON b.seat_id      = s.seat_id
+                      AND b.status      = 'CONFIRMED'
+GROUP BY f.flight_id, f.flight_number, route, ac.total_seats
+ORDER BY occupancy_pct DESC;</pre>
+            <button class="copy-btn" id="copy-btn-6" onclick="copySQL(6)">📋 Copy</button>
+          </div>
+          <div class="qresult-header">📋 Result — 5 rows (all flights, including 0% ones via LEFT JOIN)</div>
+          <div class="card-body table-wrap">
+            <table>
+              <thead><tr><th>flight_number</th><th>route</th><th>total_seats</th><th>booked_seats</th><th>occupancy_pct</th></tr></thead>
+              <tbody>
+                <tr><td><strong>AI-204</strong></td><td>Bengaluru → New Delhi</td><td>162</td><td>5</td><td><strong style="color:var(--accent-blue)">3.1%</strong></td></tr>
+                <tr><td><strong>6E-301</strong></td><td>Bengaluru → Mumbai</td><td>150</td><td>2</td><td><strong style="color:var(--accent-blue)">1.3%</strong></td></tr>
+                <tr><td><strong>SG-415</strong></td><td>New Delhi → Chennai</td><td>162</td><td>0</td><td><strong style="color:var(--text-muted)">0.0%</strong></td></tr>
+                <tr><td><strong>AI-890</strong></td><td>Mumbai → Hyderabad</td><td>350</td><td>0</td><td><strong style="color:var(--text-muted)">0.0%</strong></td></tr>
+                <tr><td><strong>6E-112</strong></td><td>Chennai → Bengaluru</td><td>150</td><td>0</td><td><strong style="color:var(--text-muted)">0.0%</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
